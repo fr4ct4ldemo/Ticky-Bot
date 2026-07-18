@@ -214,8 +214,6 @@ Runs the Jest suite (`--runInBand`). Covers embed building and transcript upload
 ## Notes
 
 - Ticky's display name and avatar are set in the Discord Developer Portal (**Bot** tab), not in this codebase — embeds read `client.user.username` dynamically, so they always match whatever is set there.
-- Placeholder implementations are included for a few lifecycle and admin commands so the project can be extended rapidly.
-- Redis is optional at startup — if it's unavailable, the bot logs a warning and continues without it.
 
 ## Security
 
