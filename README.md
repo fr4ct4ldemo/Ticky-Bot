@@ -148,6 +148,10 @@ Once Ticky is in your server (see [Full setup](#full-setup-step-by-step) above i
 
 Run `/help` at any time for an interactive walkthrough of all of the above.
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/54ef8f2d-e786-473d-8006-faaf235334d7" alt="Ticket panel example" width="420">
+</p>
+
 ---
 
 ## Command reference
