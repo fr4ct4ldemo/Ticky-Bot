@@ -1,0 +1,73 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { MessageFlags, PermissionFlagsBits } = require('discord.js');
+const prisma = require('../../lib/prisma');
+const { buildEmbed, getEmbedColor } = require('../../lib/embeds');
+
+module.exports = {
+  data: new SlashCommandBuilder()
+    .setName('category')
+    .setDescription('Manage ticket categories')
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .addSubcommand((subcommand) => subcommand.setName('list').setDescription('List ticket categories'))
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName('delete')
+        .setDescription('Delete a ticket category')
+        .addStringOption((option) => option.setName('name').setDescription('Category name').setRequired(true)),
+    ),
+  async execute(interaction) {
+    if (!interaction.guildId) {
+      const embed = buildEmbed({ title: '❌ Guild Required', description: 'This command can only be used inside a server.', color: getEmbedColor('error') });
+      return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+    }
+
+    const sub = interaction.options.getSubcommand();
+
+    try {
+      await prisma.guild.upsert({
+        where: { guildId: interaction.guildId },
+        update: {},
+        create: { guildId: interaction.guildId },
+      });
+
+      if (sub === 'list') {
+        const categories = await prisma.category.findMany({ where: { guildId: interaction.guildId }, orderBy: { createdAt: 'asc' } });
+
+        if (categories.length === 0) {
+          const embed = buildEmbed({ title: '🗂️ Ticket Categories', description: 'No categories exist yet — they’re created automatically the first time `/ticket-panel create` is run.', color: getEmbedColor('neutral') });
+          return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+        }
+
+        const embed = buildEmbed({
+          title: '🗂️ Ticket Categories',
+          description: categories.map((c) => `${c.emoji ? `${c.emoji} ` : ''}**${c.name}**${c.description ? ` — ${c.description}` : ''}`).join('\n'),
+          color: getEmbedColor('neutral'),
+        });
+        return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+      }
+
+      if (sub === 'delete') {
+        const name = interaction.options.getString('name');
+        const category = await prisma.category.findFirst({ where: { guildId: interaction.guildId, name } });
+
+        if (!category) {
+          const embed = buildEmbed({ title: '❌ Category Not Found', description: `No category named **${name}** was found.`, color: getEmbedColor('error') });
+          return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+        }
+
+        await prisma.category.delete({ where: { id: category.id } });
+
+        const embed = buildEmbed({ title: '🗑️ Category Deleted', description: `Category **${name}** has been deleted.`, color: getEmbedColor('close') });
+        return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+      }
+    } catch (error) {
+      console.error(`Error in /category ${sub}:`, error);
+      const fallback = buildEmbed({ title: '❌ Error', description: 'Unable to complete that category action.', color: getEmbedColor('error') });
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction.reply({ embeds: [fallback], flags: MessageFlags.Ephemeral });
+      } else {
+        await interaction.editReply({ embeds: [fallback] });
+      }
+    }
+  },
+};

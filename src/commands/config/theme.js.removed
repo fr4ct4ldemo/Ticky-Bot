@@ -1,0 +1,12 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { MessageFlags } = require('discord.js');
+const { buildEmbed, getEmbedColor } = require('../../lib/embeds');
+
+module.exports = {
+  data: new SlashCommandBuilder().setName('theme').setDescription('Set guild embed theme').addSubcommand((subcommand) => subcommand.setName('set').setDescription('Set current theme').addIntegerOption((option) => option.setName('color').setDescription('Embed color').setRequired(true))),
+  async execute(interaction) {
+    const color = interaction.options.getInteger('color') || 0x5865f2;
+    const embed = buildEmbed({ title: '🎨 Theme Updated', description: `Embed color set to **${color}**.`, color });
+    await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+  },
+};

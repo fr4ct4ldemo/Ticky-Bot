@@ -1,0 +1,6 @@
+{
+  "ticket.opened": "🎫 Ticket Opened",
+  "ticket.closed": "🔒 Ticket Closed",
+  "error.generic": "An unexpected error occurred while processing that request.",
+  "command.unknown": "That slash command is not registered by this scaffold."
+}

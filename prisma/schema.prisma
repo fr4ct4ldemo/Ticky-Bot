@@ -1,0 +1,215 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Guild {
+  id               String          @id @default(cuid())
+  guildId          String          @unique
+  locale           String          @default("en")
+  themeColor       Int             @default(5814783)
+  footerText       String?
+  footerIconUrl    String?
+  thumbnailUrl     String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  panels           Panel[]
+  categories       Category[]
+  teams            Team[]
+  tickets          Ticket[]
+  tags             Tag[]
+  questions        Question[]
+  transcripts      Transcript[]
+  feedbackRatings  FeedbackRating[]
+  blacklists       Blacklist[]
+  inactivityStates InactivityState[]
+}
+
+model Panel {
+  id            String   @id @default(cuid())
+  guildId       String
+  guild         Guild    @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  name          String
+  channelId     String
+  messageId     String?
+  ticketCategoryId String?
+  embedColor    Int      @default(5814783)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([guildId])
+}
+
+model Category {
+  id               String          @id @default(cuid())
+  guildId          String
+  guild            Guild           @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  name             String
+  description      String?
+  emoji            String?
+  staffTeamId      String?
+  team             Team?           @relation(fields: [staffTeamId], references: [id])
+  embedColor       Int             @default(5814783)
+  questions        Question[]
+  tickets          Ticket[]
+  inactivityStates InactivityState[]
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  @@index([guildId])
+}
+
+model Team {
+  id          String       @id @default(cuid())
+  guildId     String
+  guild       Guild        @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  name        String
+  roleIds     String
+  categories  Category[]
+  members     TeamMember[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([guildId])
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  teamId    String
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId    String
+  createdAt DateTime @default(now())
+
+  @@index([teamId])
+}
+
+model Ticket {
+  id                  String              @id @default(cuid())
+  guildId             String
+  guild               Guild               @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  categoryId          String?
+  category            Category?           @relation(fields: [categoryId], references: [id])
+  openerId            String
+  staffUserId         String?
+  channelId           String?
+  threadId            String?
+  status              String              @default("OPEN")
+  priority            String              @default("MEDIUM")
+  title               String?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  participants        TicketParticipant[]
+  transcripts         Transcript[]
+  feedbackRatings     FeedbackRating[]
+  inactivityStates    InactivityState[]
+
+  @@index([guildId])
+  @@index([status])
+}
+
+model TicketParticipant {
+  id        String   @id @default(cuid())
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  userId    String
+  role      String   @default("USER")
+  createdAt DateTime @default(now())
+
+  @@index([ticketId])
+  @@index([userId])
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  guildId   String
+  guild     Guild    @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  name      String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([guildId])
+}
+
+model Question {
+  id        String   @id @default(cuid())
+  guildId   String
+  guild     Guild    @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  categoryId String?
+  category  Category? @relation(fields: [categoryId], references: [id])
+  prompt    String
+  required  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([guildId])
+}
+
+model QuestionResponse {
+  id        String   @id @default(cuid())
+  ticketId  String
+  questionId String
+  response  String
+  createdAt DateTime @default(now())
+
+  @@index([ticketId])
+}
+
+model Transcript {
+  id            String   @id @default(cuid())
+  guildId       String
+  guild         Guild    @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  ticketId      String
+  ticket        Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  objectKey     String
+  storageUrl    String
+  createdAt     DateTime @default(now())
+
+  @@index([guildId])
+  @@index([ticketId])
+}
+
+model FeedbackRating {
+  id        String   @id @default(cuid())
+  guildId   String
+  guild     Guild    @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  userId    String
+  rating    Int
+  createdAt DateTime @default(now())
+
+  @@index([guildId])
+}
+
+model Blacklist {
+  id        String   @id @default(cuid())
+  guildId   String
+  guild     Guild    @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  userId    String
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@index([guildId])
+}
+
+model InactivityState {
+  id               String    @id @default(cuid())
+  guildId          String
+  guild            Guild     @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  ticketId         String
+  ticket           Ticket    @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  categoryId       String?
+  category         Category? @relation(fields: [categoryId], references: [id])
+  warningSentAt    DateTime?
+  autoCloseAt      DateTime?
+  state            String    @default("ACTIVE")
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([guildId])
+  @@index([ticketId])
+}
