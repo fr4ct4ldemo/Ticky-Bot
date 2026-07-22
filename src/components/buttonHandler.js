@@ -4,6 +4,7 @@ const { buildEmbed, getEmbedColor } = require('../lib/embeds');
 const { openTicketForCategory } = require('./selectMenuHandler');
 const { closeTicket, buildTicketEmbed, buildTicketActionRow } = require('../lib/tickets');
 const { hasStaffPermission } = require('../lib/permissions');
+const { t, DEFAULT_LOCALE } = require('../lib/i18n');
 
 async function handleButton(interaction) {
   const [action, payload] = interaction.customId.split(':');
@@ -26,9 +27,11 @@ async function handleButton(interaction) {
     const ticketId = payload;
     try {
       const ticket = await prisma.ticket.findUnique({ where: { id: ticketId }, include: { category: true } });
+      const guildConfig = await prisma.guild.findUnique({ where: { guildId: interaction.guildId } });
+      const locale = guildConfig?.locale || DEFAULT_LOCALE;
 
       if (!ticket || ticket.guildId !== interaction.guildId) {
-        const embed = buildEmbed({ title: '❌ Ticket Not Found', description: 'This ticket no longer exists.', color: getEmbedColor('error') });
+        const embed = buildEmbed({ title: t(locale, 'ticket.closed.notFound.title'), description: 'This ticket no longer exists.', color: getEmbedColor('error') });
         return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
       }
 
@@ -38,19 +41,19 @@ async function handleButton(interaction) {
       }
 
       if (!hasStaffPermission(interaction.member)) {
-        const embed = buildEmbed({ title: '⛔ Forbidden', description: 'Only staff can claim or unclaim tickets.', color: getEmbedColor('error') });
+        const embed = buildEmbed({ title: t(locale, 'ticket.claim.forbidden.title'), description: t(locale, 'ticket.claim.forbidden.description'), color: getEmbedColor('error') });
         return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
       }
 
       if (action === 'claim') {
         if (ticket.staffUserId) {
-          const embed = buildEmbed({ title: '❌ Already Claimed', description: `This ticket is already claimed by <@${ticket.staffUserId}>.`, color: getEmbedColor('error') });
+          const embed = buildEmbed({ title: t(locale, 'ticket.claim.alreadyClaimed.title'), description: t(locale, 'ticket.claim.alreadyClaimed.description', { user: `<@${ticket.staffUserId}>` }), color: getEmbedColor('error') });
           return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
         }
         ticket.staffUserId = interaction.user.id;
       } else {
         if (!ticket.staffUserId) {
-          const embed = buildEmbed({ title: '❌ Not Claimed', description: 'This ticket is not currently claimed.', color: getEmbedColor('error') });
+          const embed = buildEmbed({ title: t(locale, 'ticket.claim.notClaimed.title'), description: t(locale, 'ticket.claim.notClaimed.description'), color: getEmbedColor('error') });
           return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
         }
         ticket.staffUserId = null;
@@ -58,7 +61,6 @@ async function handleButton(interaction) {
 
       await prisma.ticket.update({ where: { id: ticket.id }, data: { staffUserId: ticket.staffUserId } });
 
-      const guildConfig = await prisma.guild.findUnique({ where: { guildId: interaction.guildId } });
       const embed = buildTicketEmbed({ ticket, guildConfig });
       const row = buildTicketActionRow(ticket);
 
@@ -78,14 +80,16 @@ async function handleButton(interaction) {
     const ticketId = payload;
     try {
       const ticket = await prisma.ticket.findUnique({ where: { id: ticketId } });
+      const guildConfig = await prisma.guild.findUnique({ where: { guildId: interaction.guildId } });
+      const locale = guildConfig?.locale || DEFAULT_LOCALE;
 
       if (!ticket || ticket.guildId !== interaction.guildId) {
-        const embed = buildEmbed({ title: '❌ Ticket Not Found', description: 'This ticket no longer exists.', color: getEmbedColor('error') });
+        const embed = buildEmbed({ title: t(locale, 'ticket.closed.notFound.title'), description: 'This ticket no longer exists.', color: getEmbedColor('error') });
         return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
       }
 
       if (ticket.status !== 'OPEN') {
-        const embed = buildEmbed({ title: 'ℹ️ Already Closed', description: 'This ticket has already been closed.', color: getEmbedColor('neutral') });
+        const embed = buildEmbed({ title: t(locale, 'ticket.closed.alreadyClosed.title'), description: t(locale, 'ticket.closed.alreadyClosed.description'), color: getEmbedColor('neutral') });
         return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
       }
 
@@ -93,16 +97,16 @@ async function handleButton(interaction) {
       const isStaff = hasStaffPermission(interaction.member);
 
       if (!isOpener && !isStaff) {
-        const embed = buildEmbed({ title: '⛔ Forbidden', description: 'Only the ticket opener or staff can close this ticket.', color: getEmbedColor('error') });
+        const embed = buildEmbed({ title: t(locale, 'ticket.closed.forbidden.title'), description: t(locale, 'ticket.closed.forbidden.description'), color: getEmbedColor('error') });
         return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
       }
 
       await interaction.reply({
-        embeds: [buildEmbed({ title: '🔒 Ticket Closed', description: 'This ticket has been closed. The channel will be deleted shortly.', color: getEmbedColor('close') })],
+        embeds: [buildEmbed({ title: t(locale, 'ticket.closed.title'), description: 'This ticket has been closed. The channel will be deleted shortly.', color: getEmbedColor('close') })],
         flags: MessageFlags.Ephemeral,
       });
 
-      await closeTicket({ guild: interaction.guild, ticket, reason: 'Closed via button', closedByUserId: interaction.user.id });
+      await closeTicket({ guild: interaction.guild, ticket, reason: 'Closed via button', closedByUserId: interaction.user.id, locale });
     } catch (error) {
       console.error('Error closing ticket via button:', error);
       const fallback = buildEmbed({ title: '❌ Error', description: 'Unable to close that ticket.', color: getEmbedColor('error') });

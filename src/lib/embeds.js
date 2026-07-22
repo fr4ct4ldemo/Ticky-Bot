@@ -40,6 +40,7 @@ function getEmbedColor(kind, fallback = 0x5865f2) {
     warning: 0xf1c40f,
     neutral: 0x5865f2,
     close: 0xe67e22,
+    brand: 0x7c5cff,
   };
 
   return palette[kind] ?? fallback;

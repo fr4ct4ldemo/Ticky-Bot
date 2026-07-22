@@ -15,9 +15,9 @@ async function handleHelpMenuSelect(interaction, client) {
 
   const buildEmbedFn = embedBuilders[choice] || helpCommand.buildHelpHomeEmbed;
   const embed = buildEmbedFn(client);
-  const row = helpCommand.buildHelpMenuSelectRow();
+  const selectRow = helpCommand.buildHelpMenuSelectRow();
 
-  await interaction.update({ embeds: [embed], components: [row] });
+  await interaction.update({ embeds: [embed], components: [selectRow] });
 }
 
 async function handleFaqSelect(interaction, client) {
@@ -25,8 +25,8 @@ async function handleFaqSelect(interaction, client) {
 
   if (interaction.values[0] === 'back') {
     const embed = helpCommand.buildHelpHomeEmbed(client);
-    const row = helpCommand.buildHelpMenuSelectRow();
-    return interaction.update({ embeds: [embed], components: [row] });
+    const selectRow = helpCommand.buildHelpMenuSelectRow();
+    return interaction.update({ embeds: [embed], components: [selectRow] });
   }
 
   const index = Number(interaction.values[0]);

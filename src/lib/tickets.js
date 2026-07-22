@@ -4,6 +4,7 @@ const prisma = require('./prisma');
 const { buildEmbed, getEmbedColor } = require('./embeds');
 const { uploadTranscriptToTicketPm, buildTranscriptEmbed } = require('./transcripts');
 const { clearTicketActivity } = require('./inactivity');
+const { t, DEFAULT_LOCALE } = require('./i18n');
 
 /**
  * Turns a category name + Discord username into a valid, readable channel
@@ -35,16 +36,17 @@ function buildTicketChannelName(categoryName, username) {
  * or manually attached right after creation).
  */
 function buildTicketEmbed({ ticket, guildConfig }) {
+  const locale = guildConfig?.locale || DEFAULT_LOCALE;
   const fields = [
-    { name: 'Category', value: ticket.category?.name || 'Unknown', inline: true },
-    { name: 'Ticket ID', value: ticket.id, inline: true },
+    { name: t(locale, 'ticket.opened.field.category'), value: ticket.category?.name || 'Unknown', inline: true },
+    { name: t(locale, 'ticket.opened.field.ticketId'), value: ticket.id, inline: true },
   ];
   if (ticket.staffUserId) {
-    fields.push({ name: 'Claimed By', value: `<@${ticket.staffUserId}>`, inline: true });
+    fields.push({ name: t(locale, 'ticket.opened.field.claimedBy'), value: `<@${ticket.staffUserId}>`, inline: true });
   }
   return buildEmbed({
-    title: '🎫 Ticket Opened',
-    description: `Thanks for reaching out, <@${ticket.openerId}>! A staff member will be with you shortly.`,
+    title: t(locale, 'ticket.opened.title'),
+    description: t(locale, 'ticket.opened.description', { user: `<@${ticket.openerId}>` }),
     color: getEmbedColor('success'),
     fields,
     footerText: guildConfig?.footerText || 'Ticket bot',
@@ -71,7 +73,7 @@ function buildTicketActionRow(ticket) {
  * and deletes that channel after a short delay so people have a moment to
  * see why it's going away.
  */
-async function closeTicket({ guild, ticket, reason = 'No reason provided', closedByUserId }) {
+async function closeTicket({ guild, ticket, reason = 'No reason provided', closedByUserId, locale = DEFAULT_LOCALE }) {
   await prisma.ticket.update({ where: { id: ticket.id }, data: { status: 'CLOSED' } });
   await clearTicketActivity(ticket.id).catch(() => {});
 
@@ -148,7 +150,11 @@ async function closeTicket({ guild, ticket, reason = 'No reason provided', close
     }
 
     await channel
-      .send(`🔒 This ticket was closed by <@${closedByUserId}>.\nReason: ${reason}${transcriptUrl ? `\nTranscript: ${transcriptUrl}` : ''}\n\nThis channel will be deleted in a few seconds.`)
+      .send(
+        t(locale, 'ticket.closed.channelMessage', { user: `<@${closedByUserId}>`, reason }) +
+        (transcriptUrl ? t(locale, 'ticket.closed.channelMessage.transcript', { url: transcriptUrl }) : '') +
+        t(locale, 'ticket.closed.channelMessage.deleting'),
+      )
       .catch(() => {});
 
     setTimeout(async () => {

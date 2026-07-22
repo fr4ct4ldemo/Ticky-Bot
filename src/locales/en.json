@@ -1,6 +1,53 @@
 {
-  "ticket.opened": "🎫 Ticket Opened",
-  "ticket.closed": "🔒 Ticket Closed",
+  "ticket.opened.title": "🎫 Ticket Opened",
+  "ticket.opened.description": "Thanks for reaching out, {user}! A staff member will be with you shortly.",
+  "ticket.opened.description.new": "Your ticket has been opened for **{category}**.",
+  "ticket.opened.field.category": "Category",
+  "ticket.opened.field.ticketId": "Ticket ID",
+  "ticket.opened.field.claimedBy": "Claimed By",
+  "ticket.opened.field.subject": "Subject",
+
+  "ticket.closed.title": "🔒 Ticket Closed",
+  "ticket.closed.description": "This ticket was closed.\nReason: {reason}",
+  "ticket.closed.channelMessage": "🔒 This ticket was closed by {user}.\nReason: {reason}",
+  "ticket.closed.channelMessage.transcript": "\nTranscript: {url}",
+  "ticket.closed.channelMessage.deleting": "\n\nThis channel will be deleted in a few seconds.",
+  "ticket.closed.alreadyClosed.title": "ℹ️ Already Closed",
+  "ticket.closed.alreadyClosed.description": "This ticket has already been closed.",
+  "ticket.closed.notFound.title": "❌ Ticket Not Found",
+  "ticket.closed.notFound.description": "No open ticket was found for you in this server.",
+  "ticket.closed.forbidden.title": "⛔ Forbidden",
+  "ticket.closed.forbidden.description": "Only the ticket opener or staff can close this ticket.",
+
+  "ticket.claim.alreadyClaimed.title": "❌ Already Claimed",
+  "ticket.claim.alreadyClaimed.description": "This ticket is already claimed by {user}.",
+  "ticket.claim.notClaimed.title": "❌ Not Claimed",
+  "ticket.claim.notClaimed.description": "This ticket is not currently claimed.",
+  "ticket.claim.forbidden.title": "⛔ Forbidden",
+  "ticket.claim.forbidden.description": "Only staff can claim or unclaim tickets.",
+  "ticket.claim.noTicketHere.title": "❌ No Ticket Here",
+  "ticket.claim.noTicketHere.description": "This command must be used inside an open ticket channel.",
+
+  "ticket.new.categoryNotFound.title": "❌ Category Not Found",
+  "ticket.new.categoryNotFound.description": "A category named {category} could not be found.",
+
+  "guild.required.title": "❌ Guild Required",
+  "guild.required.description": "This command can only be used inside a server.",
+
   "error.generic": "An unexpected error occurred while processing that request.",
-  "command.unknown": "That slash command is not registered by this scaffold."
+  "error.unableToCreateTicket": "Unable to create that ticket.",
+  "error.unableToCloseTicket": "Unable to close that ticket.",
+  "error.unableToClaimTicket": "Unable to {action} that ticket.",
+
+  "command.unknown": "That slash command is not registered by this scaffold.",
+
+  "language.updated.title": "🌐 Language Updated",
+  "language.updated.description": "The server language is now **{language}**.",
+  "language.invalid.title": "❌ Unsupported Language",
+  "language.invalid.description": "**{locale}** isn't a supported language code. Supported languages: {supported}.",
+
+  "help.faq.language.setQuestion": "How do I set the server language?",
+  "help.faq.language.setAnswer": "Run `/language set locale:<code>` with a locale code, e.g. `en` for English or `es` for Spanish. It applies to the whole server, not per-user.",
+  "help.faq.language.supportedQuestion": "What languages are supported?",
+  "help.faq.language.supportedAnswer": "Currently supported: {supported}. More languages are on the way."
 }

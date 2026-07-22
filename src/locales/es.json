@@ -1,0 +1,53 @@
+{
+  "ticket.opened.title": "🎫 Ticket Abierto",
+  "ticket.opened.description": "¡Gracias por contactarnos, {user}! Un miembro del equipo te atenderá en breve.",
+  "ticket.opened.description.new": "Tu ticket ha sido abierto para **{category}**.",
+  "ticket.opened.field.category": "Categoría",
+  "ticket.opened.field.ticketId": "ID del Ticket",
+  "ticket.opened.field.claimedBy": "Reclamado Por",
+  "ticket.opened.field.subject": "Asunto",
+
+  "ticket.closed.title": "🔒 Ticket Cerrado",
+  "ticket.closed.description": "Este ticket ha sido cerrado.\nMotivo: {reason}",
+  "ticket.closed.channelMessage": "🔒 Este ticket fue cerrado por {user}.\nMotivo: {reason}",
+  "ticket.closed.channelMessage.transcript": "\nTranscripción: {url}",
+  "ticket.closed.channelMessage.deleting": "\n\nEste canal se eliminará en unos segundos.",
+  "ticket.closed.alreadyClosed.title": "ℹ️ Ya Estaba Cerrado",
+  "ticket.closed.alreadyClosed.description": "Este ticket ya ha sido cerrado.",
+  "ticket.closed.notFound.title": "❌ Ticket No Encontrado",
+  "ticket.closed.notFound.description": "No se encontró ningún ticket abierto para ti en este servidor.",
+  "ticket.closed.forbidden.title": "⛔ Prohibido",
+  "ticket.closed.forbidden.description": "Solo quien abrió el ticket o el equipo de soporte pueden cerrarlo.",
+
+  "ticket.claim.alreadyClaimed.title": "❌ Ya Reclamado",
+  "ticket.claim.alreadyClaimed.description": "Este ticket ya fue reclamado por {user}.",
+  "ticket.claim.notClaimed.title": "❌ No Reclamado",
+  "ticket.claim.notClaimed.description": "Este ticket no está reclamado actualmente.",
+  "ticket.claim.forbidden.title": "⛔ Prohibido",
+  "ticket.claim.forbidden.description": "Solo el equipo de soporte puede reclamar o liberar tickets.",
+  "ticket.claim.noTicketHere.title": "❌ Sin Ticket Aquí",
+  "ticket.claim.noTicketHere.description": "Este comando debe usarse dentro de un canal de ticket abierto.",
+
+  "ticket.new.categoryNotFound.title": "❌ Categoría No Encontrada",
+  "ticket.new.categoryNotFound.description": "No se encontró una categoría llamada {category}.",
+
+  "guild.required.title": "❌ Servidor Requerido",
+  "guild.required.description": "Este comando solo puede usarse dentro de un servidor.",
+
+  "error.generic": "Ocurrió un error inesperado al procesar esa solicitud.",
+  "error.unableToCreateTicket": "No se pudo crear ese ticket.",
+  "error.unableToCloseTicket": "No se pudo cerrar ese ticket.",
+  "error.unableToClaimTicket": "No se pudo {action} ese ticket.",
+
+  "command.unknown": "Ese comando no está registrado en este bot.",
+
+  "language.updated.title": "🌐 Idioma Actualizado",
+  "language.updated.description": "El idioma del servidor ahora es **{language}**.",
+  "language.invalid.title": "❌ Idioma No Compatible",
+  "language.invalid.description": "**{locale}** no es un código de idioma compatible. Idiomas disponibles: {supported}.",
+
+  "help.faq.language.setQuestion": "¿Cómo configuro el idioma del servidor?",
+  "help.faq.language.setAnswer": "Ejecuta `/language set locale:<código>` con un código de idioma, por ejemplo `en` para inglés o `es` para español. Aplica a todo el servidor, no por usuario.",
+  "help.faq.language.supportedQuestion": "¿Qué idiomas son compatibles?",
+  "help.faq.language.supportedAnswer": "Actualmente compatibles: {supported}. Más idiomas están en camino."
+}
